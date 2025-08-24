@@ -4,4 +4,6 @@
     <string name="book_title_placeholder">Book Title</string>
     <string name="book_author_placeholder">Author Name</string>
     <string name="book_published_date_placeholder">2024</string>
+    <string name="book_thumbnail_placeholder">Book Thumbnail</string>
+    <string name="book_description_placeholder">Lorem ipsum dolor sit amet, consectetur adipiscing elit</string>
 </resources>

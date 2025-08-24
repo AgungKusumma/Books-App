@@ -1,4 +1,4 @@
-package com.agungkusuma.features.presentation.books
+package com.agungkusuma.features.books
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

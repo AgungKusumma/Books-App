@@ -1,4 +1,4 @@
-package com.agungkusuma.features.presentation.books.adapter
+package com.agungkusuma.features.books.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
