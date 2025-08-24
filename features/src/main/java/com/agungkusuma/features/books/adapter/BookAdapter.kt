@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.agungkusuma.core.domain.model.Book
+import com.agungkusuma.core.data.remote.model.BookItem
 import com.agungkusuma.features.databinding.ItemBookBinding
 import com.bumptech.glide.Glide
 
 class BookAdapter(
-    private val onItemClick: (Book) -> Unit
-) : ListAdapter<Book, BookAdapter.BookViewHolder>(BookDiffCallback()) {
+    private val onItemClick: (BookItem) -> Unit
+) : ListAdapter<BookItem, BookAdapter.BookViewHolder>(BookDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
         val binding = ItemBookBinding.inflate(
@@ -25,23 +25,23 @@ class BookAdapter(
     }
 
     class BookViewHolder(
-        private val binding: ItemBookBinding, private val onItemClick: (Book) -> Unit
+        private val binding: ItemBookBinding, private val onItemClick: (BookItem) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(book: Book) {
-            binding.tvTitle.text = book.title
-            binding.tvAuthor.text = book.authors
-            binding.tvPublishedDate.text = book.publishedDate
-            Glide.with(binding.imgThumbnail).load(book.thumbnail).into(binding.imgThumbnail)
+        fun bind(book: BookItem) = with(binding) {
+            tvTitle.text = book.volumeInfo.title
+            tvAuthor.text = book.volumeInfo.authors?.joinToString(", ") ?: "-"
+            tvPublishedDate.text = book.volumeInfo.publishedDate
+            Glide.with(imgThumbnail).load(book.volumeInfo.imageLinks?.thumbnail).into(binding.imgThumbnail)
 
-            binding.root.setOnClickListener { onItemClick(book) }
+            root.setOnClickListener { onItemClick(book) }
         }
     }
 
-    class BookDiffCallback : DiffUtil.ItemCallback<Book>() {
-        override fun areItemsTheSame(oldItem: Book, newItem: Book): Boolean =
+    class BookDiffCallback : DiffUtil.ItemCallback<BookItem>() {
+        override fun areItemsTheSame(oldItem: BookItem, newItem: BookItem): Boolean =
             oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: Book, newItem: Book): Boolean = oldItem == newItem
+        override fun areContentsTheSame(oldItem: BookItem, newItem: BookItem): Boolean = oldItem == newItem
     }
 }

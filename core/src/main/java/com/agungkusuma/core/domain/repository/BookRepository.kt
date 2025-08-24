@@ -1,7 +1,7 @@
 package com.agungkusuma.core.domain.repository
 
-import com.agungkusuma.core.domain.model.Book
+import com.agungkusuma.core.data.remote.model.BooksResponse
 
 interface BookRepository {
-    suspend fun getBooks(): List<Book>
+    suspend fun getBooks(): BooksResponse
 }

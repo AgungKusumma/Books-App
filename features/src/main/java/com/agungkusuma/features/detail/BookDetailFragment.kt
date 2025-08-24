@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.agungkusuma.core.domain.model.Book
+import com.agungkusuma.core.data.remote.model.BookItem
 import com.agungkusuma.core.utils.Constants
 import com.agungkusuma.features.databinding.FragmentBookDetailBinding
 import com.bumptech.glide.Glide
@@ -28,16 +28,20 @@ class BookDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val book = arguments?.getParcelable<Book>(Constants.KeyParam.KEY_BOOK)
+        val book = arguments?.getParcelable<BookItem>(Constants.KeyParam.KEY_BOOK)
 
+        setupData(book)
+    }
+
+    private fun setupData(book: BookItem?) = with(binding) {
         book?.let {
-            binding.tvTitle.text = book.title
-            binding.tvAuthor.text = book.authors
-            binding.tvPublishedDate.text = book.publishedDate
+            tvTitle.text = book.volumeInfo.title
+            tvAuthor.text = book.volumeInfo.authors?.joinToString(", ") ?: "-"
+            tvPublishedDate.text = book.volumeInfo.publishedDate
 
-            Glide.with(this)
-                .load(book.thumbnail)
-                .into(binding.imgThumbnail)
+            Glide.with(requireContext())
+                .load(book.volumeInfo.imageLinks?.thumbnail)
+                .into(imgThumbnail)
         }
     }
 

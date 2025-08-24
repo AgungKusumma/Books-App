@@ -13,8 +13,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.agungkusuma.common.extensions.showSnackbar
 import com.agungkusuma.common.navigation.FeaturesNavigation
+import com.agungkusuma.common.state.UiState
 import com.agungkusuma.core.utils.Constants
+import com.agungkusuma.core.utils.network.NetworkErrorHandler
 import com.agungkusuma.features.books.adapter.BookAdapter
 import com.agungkusuma.features.databinding.FragmentBookListBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,8 +64,23 @@ class BookListFragment : Fragment() {
     private fun observeData() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.bookState.collect { books ->
-                    bookAdapter.submitList(books)
+                viewModel.bookState.collect { state ->
+                    when (state) {
+                        is UiState.Success -> {
+                            val data = state.data
+                            bookAdapter.submitList(data.items)
+                        }
+
+                        is UiState.Error -> {
+                            val message = NetworkErrorHandler.getErrorMessage(
+                                requireContext(),
+                                state.throwable
+                            )
+                            showSnackbar(message)
+                        }
+
+                        else -> {}
+                    }
                 }
             }
         }

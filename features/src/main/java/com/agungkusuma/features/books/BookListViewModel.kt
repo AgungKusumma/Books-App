@@ -2,7 +2,9 @@ package com.agungkusuma.features.books
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.agungkusuma.core.domain.model.Book
+import com.agungkusuma.common.state.UiState
+import com.agungkusuma.core.data.remote.model.BookItem
+import com.agungkusuma.core.data.remote.model.BooksResponse
 import com.agungkusuma.core.domain.usecase.GetBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -17,10 +19,10 @@ class BookListViewModel @Inject constructor(
     private val getBooksUseCase: GetBooksUseCase
 ) : ViewModel() {
 
-    private val _bookState = MutableStateFlow<List<Book>>(emptyList())
-    val bookState: StateFlow<List<Book>> = _bookState
+    private val _bookState = MutableStateFlow<UiState<BooksResponse>>(UiState.Idle)
+    val bookState: StateFlow<UiState<BooksResponse>> = _bookState
 
-    private var originalList: List<Book> = emptyList()
+    private var originalList: List<BookItem> = emptyList()
     private var searchJob: Job? = null
 
     init {
@@ -29,9 +31,14 @@ class BookListViewModel @Inject constructor(
 
     private fun loadBooks() {
         viewModelScope.launch {
-            val books = getBooksUseCase()
-            originalList = books
-            _bookState.value = books
+            _bookState.value = UiState.Loading
+            try {
+                val response = getBooksUseCase()
+                originalList = response.items
+                _bookState.value = UiState.Success(response)
+            } catch (e: Exception) {
+                _bookState.value = UiState.Error(e)
+            }
         }
     }
 
@@ -44,11 +51,13 @@ class BookListViewModel @Inject constructor(
                 originalList
             } else {
                 originalList.filter {
-                    it.title.contains(query, ignoreCase = true) ||
-                            it.authors.contains(query, ignoreCase = true)
+                    it.volumeInfo.title.contains(query, ignoreCase = true) ||
+                            (it.volumeInfo.authors?.any { author ->
+                                author.contains(query, ignoreCase = true)
+                            } == true)
                 }
             }
-            _bookState.value = filtered
+            _bookState.value = UiState.Success(BooksResponse(filtered))
         }
     }
 }
