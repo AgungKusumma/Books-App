@@ -1,6 +1,8 @@
 package com.agungkusuma.features.books
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +19,6 @@ import com.agungkusuma.features.books.adapter.BookAdapter
 import com.agungkusuma.features.databinding.FragmentBookListBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -34,7 +35,6 @@ class BookListFragment : Fragment() {
     private val bookAdapter: BookAdapter by lazy {
         BookAdapter(
             onItemClick = {
-                Timber.e("Book clicked: $it")
                 featuresNavigation.openDetailPage(
                     bundleOf(Constants.KeyParam.KEY_BOOK to it)
                 )
@@ -55,6 +55,7 @@ class BookListFragment : Fragment() {
 
         setupRecyclerView()
         observeData()
+        setupSearch()
     }
 
     private fun observeData() {
@@ -72,6 +73,18 @@ class BookListFragment : Fragment() {
             adapter = bookAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+    }
+
+    private fun setupSearch() {
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.searchBooks(s?.toString() ?: "")
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
     }
 
     override fun onDestroyView() {
