@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.agungkusuma.common.R
 import com.agungkusuma.core.data.remote.model.BookItem
 import com.agungkusuma.core.utils.Constants
 import com.agungkusuma.features.databinding.FragmentBookDetailBinding
@@ -38,6 +39,12 @@ class BookDetailFragment : Fragment() {
             tvTitle.text = book.volumeInfo.title
             tvAuthor.text = book.volumeInfo.authors?.joinToString(", ") ?: "-"
             tvPublishedDate.text = book.volumeInfo.publishedDate
+            tvDescription.text = book.volumeInfo.description
+            tvDescription.text = if (!it.volumeInfo.description.isNullOrBlank()) {
+                it.volumeInfo.description
+            } else {
+                getString(R.string.no_description)
+            }
 
             Glide.with(requireContext())
                 .load(book.volumeInfo.imageLinks?.thumbnail)
