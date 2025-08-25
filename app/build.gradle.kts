@@ -69,7 +69,4 @@ dependencies {
     implementation(libs.coroutines.android)
 
     implementation(libs.timber)
-
-    // LeakCanary
-    debugImplementation(libs.leakcanary)
 }
