@@ -35,6 +35,17 @@ BooksApp is a simple Android application that allows users to browse a list of b
 - Click on a book to view its details
 - Use the search bar to filter books locally
 
+## Screenshots
+
+### Light Mode
+<img src="assets/books_app_home_light.jpg" width="200" /> <img src="assets/books_app_detail_light.jpg" width="200" /> <img src="assets/books_app_search_light.jpg" width="200" />
+
+### Dark Mode
+<img src="assets/books_app_home_dark.jpg" width="200" /> <img src="assets/books_app_detail_dark.jpg" width="200" /> <img src="assets/books_app_search_dark.jpg" width="200" />
+
+## Demo Video
+Watch the app demo here: [BooksApp Demo Video](https://drive.google.com/file/d/1B5bVzVKPMOA9kL4Z1VNKbnnRP8gI9E8o/view?usp=sharing)
+
 ## Notes
 
 - LeakCanary is integrated to detect memory leaks, but it only runs in the **dev branch**
