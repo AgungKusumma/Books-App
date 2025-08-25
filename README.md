@@ -40,4 +40,5 @@ BooksApp is a simple Android application that allows users to browse a list of b
 - LeakCanary is integrated to detect memory leaks, but it only runs in the **dev branch**
 - The app follows an offline-first caching strategy
 - Clean Architecture is used to separate concerns and make the app maintainable
-- MVVM pattern is applied for UI and data handling
+- MVVM pattern is applied for UI and data handling 
+- Supports Android 8.0 (API level 26) and above
