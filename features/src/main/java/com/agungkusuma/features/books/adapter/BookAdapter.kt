@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.agungkusuma.common.R
 import com.agungkusuma.core.data.local.BookEntity
 import com.agungkusuma.features.databinding.ItemBookBinding
 import com.bumptech.glide.Glide
@@ -36,6 +37,8 @@ class BookAdapter(
             Glide.with(imgThumbnail)
                 .load(book.thumbnail)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.drawable.placeholder_image)
+                .error(R.drawable.placeholder_image)
                 .into(binding.imgThumbnail)
 
             root.setOnClickListener { onItemClick(book) }
