@@ -4,6 +4,7 @@ import com.agungkusuma.core.BuildConfig
 
 object Constants {
     const val DEFAULT_BOOK_QUERY = "subject:chess"
+    const val DEFAULT_MAX_RESULTS = 30
 
     object ApiComponents {
         const val BASE_URL = BuildConfig.BASE_URL
@@ -11,7 +12,6 @@ object Constants {
 
     object ApiEndpoint {
         const val GET_BOOK = "volumes"
-        const val GET_BOOK_DETAIL = "volumes/{id}"
     }
 
     object KeyParam {
