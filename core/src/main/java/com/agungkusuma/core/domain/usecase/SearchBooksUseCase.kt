@@ -5,8 +5,8 @@ import com.agungkusuma.core.domain.repository.BookRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetBooksUseCase @Inject constructor(
+class SearchBooksUseCase @Inject constructor(
     private val repository: BookRepository
 ) {
-    operator fun invoke(): Flow<List<BookEntity>> = repository.observeBooks()
+    operator fun invoke(query: String): Flow<List<BookEntity>> = repository.searchBooks(query)
 }

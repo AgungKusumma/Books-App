@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.agungkusuma.common.extensions.showSnackbar
 import com.agungkusuma.common.navigation.FeaturesNavigation
 import com.agungkusuma.common.state.UiState
+import com.agungkusuma.core.data.mapper.toBookItem
 import com.agungkusuma.core.utils.Constants
 import com.agungkusuma.core.utils.network.NetworkErrorHandler
 import com.agungkusuma.features.books.adapter.BookAdapter
@@ -38,8 +39,9 @@ class BookListFragment : Fragment() {
     private val bookAdapter: BookAdapter by lazy {
         BookAdapter(
             onItemClick = {
+                val item = it.toBookItem()
                 featuresNavigation.openDetailPage(
-                    bundleOf(Constants.KeyParam.KEY_BOOK to it)
+                    bundleOf(Constants.KeyParam.KEY_BOOK to item)
                 )
             }
         )
@@ -59,6 +61,7 @@ class BookListFragment : Fragment() {
         setupRecyclerView()
         observeData()
         setupSearch()
+        setupSwipeRefresh()
     }
 
     private fun observeData() {
@@ -66,30 +69,23 @@ class BookListFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.bookState.collect { state ->
                     when (state) {
+                        is UiState.Idle -> binding.swipeRefresh.isRefreshing = false
+                        is UiState.Loading -> binding.swipeRefresh.isRefreshing = true
                         is UiState.Success -> {
-                            val data = state.data
-                            bookAdapter.submitList(data.items)
+                            bookAdapter.submitList(state.data)
+                            binding.swipeRefresh.isRefreshing = false
                         }
-
                         is UiState.Error -> {
                             val message = NetworkErrorHandler.getErrorMessage(
                                 requireContext(),
                                 state.throwable
                             )
                             showSnackbar(message)
+                            binding.swipeRefresh.isRefreshing = false
                         }
-
-                        else -> {}
                     }
                 }
             }
-        }
-    }
-
-    private fun setupRecyclerView() {
-        with(binding.rvBooks) {
-            adapter = bookAdapter
-            layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
@@ -103,6 +99,17 @@ class BookListFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
+    }
+
+    private fun setupRecyclerView() {
+        with(binding.rvBooks) {
+            adapter = bookAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
     }
 
     override fun onDestroyView() {

@@ -5,13 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.agungkusuma.core.data.remote.model.BookItem
+import com.agungkusuma.core.data.local.BookEntity
 import com.agungkusuma.features.databinding.ItemBookBinding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 
 class BookAdapter(
-    private val onItemClick: (BookItem) -> Unit
-) : ListAdapter<BookItem, BookAdapter.BookViewHolder>(BookDiffCallback()) {
+    private val onItemClick: (BookEntity) -> Unit
+) : ListAdapter<BookEntity, BookAdapter.BookViewHolder>(BookDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
         val binding = ItemBookBinding.inflate(
@@ -25,23 +26,27 @@ class BookAdapter(
     }
 
     class BookViewHolder(
-        private val binding: ItemBookBinding, private val onItemClick: (BookItem) -> Unit
+        private val binding: ItemBookBinding, private val onItemClick: (BookEntity) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(book: BookItem) = with(binding) {
-            tvTitle.text = book.volumeInfo.title
-            tvAuthor.text = book.volumeInfo.authors?.joinToString(", ") ?: "-"
-            tvPublishedDate.text = book.volumeInfo.publishedDate
-            Glide.with(imgThumbnail).load(book.volumeInfo.imageLinks?.thumbnail).into(binding.imgThumbnail)
+        fun bind(book: BookEntity) = with(binding) {
+            tvTitle.text = book.title
+            tvAuthor.text = book.authors
+            tvPublishedDate.text = book.publishedDate
+            Glide.with(imgThumbnail)
+                .load(book.thumbnail)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(binding.imgThumbnail)
 
             root.setOnClickListener { onItemClick(book) }
         }
     }
 
-    class BookDiffCallback : DiffUtil.ItemCallback<BookItem>() {
-        override fun areItemsTheSame(oldItem: BookItem, newItem: BookItem): Boolean =
+    class BookDiffCallback : DiffUtil.ItemCallback<BookEntity>() {
+        override fun areItemsTheSame(oldItem: BookEntity, newItem: BookEntity): Boolean =
             oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: BookItem, newItem: BookItem): Boolean = oldItem == newItem
+        override fun areContentsTheSame(oldItem: BookEntity, newItem: BookEntity): Boolean =
+            oldItem == newItem
     }
 }

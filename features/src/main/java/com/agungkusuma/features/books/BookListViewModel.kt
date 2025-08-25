@@ -3,61 +3,66 @@ package com.agungkusuma.features.books
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agungkusuma.common.state.UiState
-import com.agungkusuma.core.data.remote.model.BookItem
-import com.agungkusuma.core.data.remote.model.BooksResponse
+import com.agungkusuma.core.data.local.BookEntity
 import com.agungkusuma.core.domain.usecase.GetBooksUseCase
+import com.agungkusuma.core.domain.usecase.RefreshBooksUseCase
+import com.agungkusuma.core.domain.usecase.SearchBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class BookListViewModel @Inject constructor(
-    private val getBooksUseCase: GetBooksUseCase
+    private val getBooksUseCase: GetBooksUseCase,
+    private val searchBooksUseCase: SearchBooksUseCase,
+    private val refreshBooksUseCase: RefreshBooksUseCase
 ) : ViewModel() {
+    private val query = MutableStateFlow("")
 
-    private val _bookState = MutableStateFlow<UiState<BooksResponse>>(UiState.Idle)
-    val bookState: StateFlow<UiState<BooksResponse>> = _bookState
-
-    private var originalList: List<BookItem> = emptyList()
-    private var searchJob: Job? = null
+    private val _bookState = MutableStateFlow<UiState<List<BookEntity>>>(UiState.Idle)
+    val bookState: StateFlow<UiState<List<BookEntity>>> = _bookState
 
     init {
-        loadBooks()
+        observeBooks()
     }
 
-    private fun loadBooks() {
+    private fun observeBooks() {
         viewModelScope.launch {
-            _bookState.value = UiState.Loading
             try {
-                val response = getBooksUseCase()
-                originalList = response.items
-                _bookState.value = UiState.Success(response)
+                query.flatMapLatest { q ->
+                    if (q.isBlank()) getBooksUseCase() else searchBooksUseCase(q)
+                }
+                    .onStart { _bookState.value = UiState.Loading }
+                    .collect { list ->
+                        _bookState.value = UiState.Success(list)
+
+                        if (query.value.isBlank() && list.isEmpty()) {
+                            refresh()
+                        }
+                    }
             } catch (e: Exception) {
                 _bookState.value = UiState.Error(e)
             }
         }
     }
 
-    // local search
-    fun searchBooks(query: String) {
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            delay(300)
-            val filtered = if (query.isBlank()) {
-                originalList
-            } else {
-                originalList.filter {
-                    it.volumeInfo.title.contains(query, ignoreCase = true) ||
-                            (it.volumeInfo.authors?.any { author ->
-                                author.contains(query, ignoreCase = true)
-                            } == true)
-                }
+    fun searchBooks(text: String) {
+        viewModelScope.launch { query.emit(text) }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            try {
+                _bookState.value = UiState.Loading
+                refreshBooksUseCase()
+                _bookState.value = UiState.Idle
+            } catch (e: Exception) {
+                _bookState.value = UiState.Error(e)
             }
-            _bookState.value = UiState.Success(BooksResponse(filtered))
         }
     }
 }

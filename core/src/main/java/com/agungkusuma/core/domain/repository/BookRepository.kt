@@ -1,7 +1,10 @@
 package com.agungkusuma.core.domain.repository
 
-import com.agungkusuma.core.data.remote.model.BooksResponse
+import com.agungkusuma.core.data.local.BookEntity
+import kotlinx.coroutines.flow.Flow
 
 interface BookRepository {
-    suspend fun getBooks(): BooksResponse
+    fun observeBooks(): Flow<List<BookEntity>>
+    fun searchBooks(query: String): Flow<List<BookEntity>>
+    suspend fun refreshBooks()
 }
