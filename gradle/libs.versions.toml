@@ -25,6 +25,7 @@ lifecycleLivedataKtx = "2.9.1"
 fragmentKtx = "1.8.8"
 glide = "4.15.1"
 timber = "5.0.1"
+leakcanary = "2.14"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -72,6 +73,9 @@ glide-compiler = { group = "com.github.bumptech.glide", name = "ksp", version.re
 
 # Timber Logging
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
+# Memory Leak Detection
+leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
